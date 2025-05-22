@@ -1,0 +1,503 @@
+[
+  {
+    "id": "mqtt_soc_in",
+    "type": "mqtt in",
+    "z": "3",
+    "name": "Lees SOC van GX",
+    "topic": "N/+/battery/0/Soc",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "mqtt_broker_dess",
+    "x": 130,
+    "y": 60,
+    "wires": [
+      [
+        "extract_soc"
+      ]
+    ]
+  },
+  {
+    "id": "extract_soc",
+    "type": "function",
+    "z": "3",
+    "name": "set flow.battery_soc",
+    "func": "if (typeof msg.payload.value === 'number') {\n    flow.set('battery_soc', msg.payload.value);\n}\nreturn null;",
+    "outputs": 0,
+    "noerr": 0,
+    "x": 340,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "mqtt_price_in",
+    "type": "mqtt in",
+    "z": "4",
+    "name": "Lees Tibber prijs",
+    "topic": "tibber/price/now",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "mqtt_broker_dess",
+    "x": 140,
+    "y": 60,
+    "wires": [
+      [
+        "set_tibber_price"
+      ]
+    ]
+  },
+  {
+    "id": "set_tibber_price",
+    "type": "function",
+    "z": "4",
+    "name": "set flow.tibber_price",
+    "func": "if (typeof msg.payload === 'number') {\n    flow.set('tibber_price', msg.payload);\n}\nreturn null;",
+    "outputs": 0,
+    "noerr": 0,
+    "x": 360,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "mqtt_forecast_total",
+    "type": "mqtt in",
+    "z": "4",
+    "name": "Lees forecast totaal",
+    "topic": "user/forecast/pvgis/today_total",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "mqtt_broker_dess",
+    "x": 150,
+    "y": 120,
+    "wires": [
+      [
+        "set_forecast_total"
+      ]
+    ]
+  },
+  {
+    "id": "set_forecast_total",
+    "type": "function",
+    "z": "4",
+    "name": "set flow.forecast_today_total",
+    "func": "if (typeof msg.payload === 'number') {\n    flow.set('forecast_today_total', msg.payload);\n}\nreturn null;",
+    "outputs": 0,
+    "noerr": 0,
+    "x": 390,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "inject_price",
+    "type": "inject",
+    "z": "2",
+    "name": "Tibber prijs (simulatie)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "300",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "0.068",
+    "payloadType": "num",
+    "x": 120,
+    "y": 60,
+    "wires": [
+      [
+        "set_price"
+      ]
+    ]
+  },
+  {
+    "id": "set_price",
+    "type": "function",
+    "z": "2",
+    "name": "set flow.tibber_price",
+    "func": "flow.set('tibber_price', msg.payload);\nreturn null;",
+    "outputs": 0,
+    "noerr": 0,
+    "x": 340,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "inject_soc",
+    "type": "inject",
+    "z": "2",
+    "name": "SOC (simulatie)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "300",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "25",
+    "payloadType": "num",
+    "x": 110,
+    "y": 120,
+    "wires": [
+      [
+        "set_soc"
+      ]
+    ]
+  },
+  {
+    "id": "set_soc",
+    "type": "function",
+    "z": "2",
+    "name": "set flow.battery_soc",
+    "func": "flow.set('battery_soc', msg.payload);\nreturn null;",
+    "outputs": 0,
+    "noerr": 0,
+    "x": 330,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "inject_forecast",
+    "type": "inject",
+    "z": "2",
+    "name": "Forecast totaal (simulatie)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "300",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "135",
+    "payloadType": "num",
+    "x": 140,
+    "y": 180,
+    "wires": [
+      [
+        "set_forecast"
+      ]
+    ]
+  },
+  {
+    "id": "set_forecast",
+    "type": "function",
+    "z": "2",
+    "name": "set flow.forecast_today_total",
+    "func": "flow.set('forecast_today_total', msg.payload);\nreturn null;",
+    "outputs": 0,
+    "noerr": 0,
+    "x": 380,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "inject_trigger",
+    "type": "inject",
+    "z": "1",
+    "name": "Check conditions hourly",
+    "props": [],
+    "repeat": "3600",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payloadType": "date",
+    "x": 120,
+    "y": 80,
+    "wires": [
+      [
+        "function_control_charge"
+      ]
+    ]
+  },
+  {
+    "id": "function_control_charge",
+    "type": "function",
+    "z": "1",
+    "name": "Beslis of laden mag",
+    "func": "// Voorwaarden:\n// - prijs \u2265 0.06 \u20ac/kWh\n// - voorspelde zon > 100 kWh\n// - SOC \u2265 18%\n// - v\u00f3\u00f3r 10:00\n\nconst now = new Date();\nconst hour = now.getHours();\n\nconst price = flow.get('tibber_price') || 0.10;  // laad actuele prijs via aparte Tibber node\nconst soc = flow.get('battery_soc') || 30;       // SOC via MQTT/dbus (bijv. battery/0/Soc)\nconst forecast = flow.get('forecast_today_total') || 0;  // totaal kWh voorspeld vandaag\n\nif (hour < 10 && price >= 0.06 && forecast > 100 && soc >= 18) {\n    msg.payload = 0; // laadvermogen 0 W\n    msg.topic = \"W/com.victronenergy.settings/Settings/CGwacs/BatteryLife/MaxChargePower\";\n    return msg;\n} else {\n    return null;  // niets doen\n}",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 360,
+    "y": 80,
+    "wires": [
+      [
+        "mqtt_control"
+      ]
+    ]
+  },
+  {
+    "id": "mqtt_control",
+    "type": "mqtt out",
+    "z": "1",
+    "name": "Stuur MaxChargePower",
+    "topic": "",
+    "qos": "",
+    "retain": "true",
+    "broker": "mqtt_broker_dess",
+    "x": 620,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "inject_correct_forecast",
+    "type": "inject",
+    "z": "5",
+    "name": "Corrigeer dagelijks",
+    "props": [],
+    "repeat": "86400",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payloadType": "date",
+    "x": 130,
+    "y": 80,
+    "wires": [
+      [
+        "seasonal_forecast_corrector"
+      ]
+    ]
+  },
+  {
+    "id": "seasonal_forecast_corrector",
+    "type": "function",
+    "z": "5",
+    "name": "Pas forecast aan op seizoen",
+    "func": "// Haal originele forecast op\nlet raw = flow.get('forecast_today_total') || 0;\n\n// Seizoensfactoren\nconst month = new Date().getMonth(); // 0 = jan, 11 = dec\nconst factors = [0.5, 0.6, 0.7, 0.8, 1.0, 1.0, 1.0, 1.0, 0.8, 0.6, 0.5, 0.5];\n\nlet factor = factors[month];\nlet corrected = +(raw * factor).toFixed(1);\n\nflow.set('forecast_today_total', corrected);\n\nmsg.payload = {\n    raw_forecast: raw,\n    corrected_forecast: corrected,\n    factor: factor\n};\nmsg.topic = \"forecast/corrected\";\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 400,
+    "y": 80,
+    "wires": [
+      [
+        "debug_forecast"
+      ]
+    ]
+  },
+  {
+    "id": "debug_forecast",
+    "type": "debug",
+    "z": "5",
+    "name": "Toon correctie",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 640,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "inject_cloud_update",
+    "type": "inject",
+    "z": "6",
+    "name": "Elke 30 min",
+    "props": [],
+    "repeat": "1800",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payloadType": "date",
+    "x": 120,
+    "y": 60,
+    "wires": [
+      [
+        "get_cloud_data"
+      ]
+    ]
+  },
+  {
+    "id": "get_cloud_data",
+    "type": "http request",
+    "z": "6",
+    "name": "Ophaal bewolkingsgraad",
+    "method": "GET",
+    "ret": "obj",
+    "url": "https://api.open-meteo.com/v1/forecast?latitude=LATITUDE&longitude=LONGITUDE&current=cloudcover",
+    "tls": "",
+    "x": 360,
+    "y": 60,
+    "wires": [
+      [
+        "adjust_forecast_by_cloud"
+      ]
+    ]
+  },
+  {
+    "id": "adjust_forecast_by_cloud",
+    "type": "function",
+    "z": "6",
+    "name": "Pas forecast aan via cloud",
+    "func": "let raw = flow.get('forecast_today_total') || 0;\nlet cloud = msg.payload.current?.cloudcover ?? 0; // 0 - 100\n\n// Simpele lineaire correctie: minder zon = minder opbrengst\n// Voorbeeld: 100% bewolking = 50% verlies (factor 0.5)\nlet factor = 1 - (cloud / 200); // dus max reductie = 50%\nlet corrected = +(raw * factor).toFixed(1);\n\nflow.set('forecast_today_total', corrected);\n\nmsg.payload = {\n    raw_forecast: raw,\n    cloudcover_percent: cloud,\n    factor: factor,\n    corrected_forecast: corrected\n};\nmsg.topic = \"forecast/cloudcorrected\";\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 650,
+    "y": 60,
+    "wires": [
+      [
+        "debug_cloud_forecast"
+      ]
+    ]
+  },
+  {
+    "id": "debug_cloud_forecast",
+    "type": "debug",
+    "z": "6",
+    "name": "Toon cloudcorrectie",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 900,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "inject_soc_adjust",
+    "type": "inject",
+    "z": "7",
+    "name": "Elke 2 uur",
+    "props": [],
+    "repeat": "7200",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payloadType": "date",
+    "x": 110,
+    "y": 60,
+    "wires": [
+      [
+        "function_dynamic_soc"
+      ]
+    ]
+  },
+  {
+    "id": "function_dynamic_soc",
+    "type": "function",
+    "z": "7",
+    "name": "Bepaal dynamische Min SOC",
+    "func": "let forecast = flow.get('forecast_today_total') || 0;\nlet minSoc = 20; // default fallback\n\nif (forecast > 150) {\n    minSoc = 10;  // veel zon verwacht\n} else if (forecast > 100) {\n    minSoc = 15;\n} else if (forecast > 60) {\n    minSoc = 20;\n} else {\n    minSoc = 30;  // weinig zon \u2192 reserve aanhouden\n}\n\nmsg.payload = minSoc;\nmsg.topic = \"W/com.victronenergy.settings/Settings/CGwacs/BatteryLife/MinimumSocLimit\";\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 360,
+    "y": 60,
+    "wires": [
+      [
+        "mqtt_send_soc"
+      ]
+    ]
+  },
+  {
+    "id": "mqtt_send_soc",
+    "type": "mqtt out",
+    "z": "7",
+    "name": "Stel min SOC in",
+    "topic": "",
+    "qos": "",
+    "retain": "true",
+    "broker": "mqtt_broker_dess",
+    "x": 610,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "inject_check_price",
+    "type": "inject",
+    "z": "9",
+    "name": "Elke 5 min",
+    "props": [],
+    "repeat": "300",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payloadType": "date",
+    "x": 120,
+    "y": 80,
+    "wires": [
+      [
+        "price_control_logic"
+      ]
+    ]
+  },
+  {
+    "id": "price_control_logic",
+    "type": "function",
+    "z": "9",
+    "name": "Controleer Tibber prijs",
+    "func": "const price = flow.get('tibber_price') || 0.05;\n\n// topics to disable/enable\nconst disableTopics = [\n    { topic: \"W/DEVICE_ID/solarcharger/0/Settings/ChargeCurrent\", payload: 0 },\n    { topic: \"modbus/FRONIUS_IP_1/40084\", payload: 0 }, // Fronius 5kW\n    { topic: \"modbus/FRONIUS_IP_2/40084\", payload: 0 }, // Fronius 8.2kW\n    { topic: \"modbus/FRONIUS_IP_3/40084\", payload: 0 }  // Fronius 7kW\n];\n\nconst enableTopics = [\n    { topic: \"W/DEVICE_ID/solarcharger/0/Settings/ChargeCurrent\", payload: 100 },\n    { topic: \"modbus/FRONIUS_IP_1/40084\", payload: 100 },\n    { topic: \"modbus/FRONIUS_IP_2/40084\", payload: 100 },\n    { topic: \"modbus/FRONIUS_IP_3/40084\", payload: 100 }\n];\n\nif (price < -0.14) {\n    return [disableTopics];\n} else {\n    return [enableTopics];\n}",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 360,
+    "y": 80,
+    "wires": [
+      [
+        "split_mqtt_commands"
+      ]
+    ]
+  },
+  {
+    "id": "split_mqtt_commands",
+    "type": "split",
+    "z": "9",
+    "name": "Splits opdrachten",
+    "splt": "",
+    "spltType": "json",
+    "arraySplt": 1,
+    "x": 630,
+    "y": 80,
+    "wires": [
+      [
+        "mqtt_output"
+      ]
+    ]
+  },
+  {
+    "id": "mqtt_output",
+    "type": "mqtt out",
+    "z": "9",
+    "name": "Stuur naar GX/omvormers",
+    "topic": "",
+    "qos": "",
+    "retain": "false",
+    "broker": "mqtt_broker_dess",
+    "x": 860,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "mqtt_broker_dess",
+    "type": "mqtt-broker",
+    "name": "Victron GX MQTT",
+    "broker": "localhost",
+    "port": "1883",
+    "clientid": "",
+    "usetls": false,
+    "compatmode": true,
+    "keepalive": "60",
+    "cleansession": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": ""
+  }
+]
